@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompNfse xmlns="http://www.abrasf.org.br/ABRASF/arquivos/nfse.xsd">
+  <Nfse>
+    <InfNfse Id="NFSE1">
+      <Numero>183</Numero>
+      <CodigoVerificacao>qOD3XLFsi</CodigoVerificacao>
+      <DataEmissao>2026-04-14T17:42:47</DataEmissao>
+      <Competencia>2026-04-01</Competencia>
+      <PrestadorServico>
+        <IdentificacaoPrestador>
+          <Cnpj>31070254000100</Cnpj>
+          <InscricaoMunicipal>6040837</InscricaoMunicipal>
+        </IdentificacaoPrestador>
+        <RazaoSocial>BRASIL HIDRAULICOS PECAS E SERVICOS LTDA</RazaoSocial>
+        <Endereco>
+          <Endereco>RESIDENCIAL TORQUATO NETO</Endereco>
+          <Numero>4</Numero>
+          <Complemento>QUADRA 018 CASA 04</Complemento>
+          <Bairro>ESPLANADA</Bairro>
+          <CodigoMunicipio>2211001</CodigoMunicipio>
+          <Uf>PI</Uf>
+          <Cep>64039555</Cep>
+        </Endereco>
+      </PrestadorServico>
+      <TomadorServico>
+        <IdentificacaoTomador>
+          <CpfCnpj>
+            <Cnpj>28390966000606</Cnpj>
+          </CpfCnpj>
+          <InscricaoMunicipal>7135319</InscricaoMunicipal>
+        </IdentificacaoTomador>
+        <RazaoSocial>LAND SOLUCOES LTDA</RazaoSocial>
+        <Endereco>
+          <Endereco>AVENIDA PREFEITO WALL FERRAZ</Endereco>
+          <Numero>13651</Numero>
+          <Complemento>LETRA A GALPAO G6</Complemento>
+          <Bairro>PARQUE JACINTA</Bairro>
+          <CodigoMunicipio>2211001</CodigoMunicipio>
+          <Uf>PI</Uf>
+          <Cep>64035180</Cep>
+        </Endereco>
+      </TomadorServico>
+      <Servico>
+        <Valores>
+          <ValorServicos>950.00</ValorServicos>
+          <ValorLiquidoNfse>950.00</ValorLiquidoNfse>
+          <ValorIss>0.00</ValorIss>
+          <ValorPis>0.00</ValorPis>
+          <ValorCofins>0.00</ValorCofins>
+        </Valores>
+        <ItemListaServico>14.01</ItemListaServico>
+        <CodigoCnae>45200101</CodigoCnae>
+        <Discriminacao>RECONDICIONAMENTO 01 VALVULA CONTRA BALANCO - R$750,00 | MAO DE OBRA - R$200,00</Discriminacao>
+        <CodigoMunicipio>2211001</CodigoMunicipio>
+      </Servico>
+    </InfNfse>
+  </Nfse>
+</CompNfse>

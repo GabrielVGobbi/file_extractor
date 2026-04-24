@@ -1,0 +1,62 @@
+Prefeitura Municipal de Teresina
+Secretaria Municipal de Finanças
+
+Nota Fiscal de Serviços Eletrônica
+NFSe - Prestador
+
+DADOS DA NFSe
+Data e hora de emissão Competência Número / Série
+14/04/2026 17:42:47 04/2026 183/U
+Código de Verificação
+goD3XLFsi
+
+EMITENTE PRESTADOR DO SERVIÇO
+CPF/CNPJ /NIF Inscrição Municipal Telefone
+31.070.254/0001-00 604083-7 (86) 99354049
+Nome / Nome Empresarial E-mail
+BRASIL HIDRAULICOS PECAS E SERVICOS LTDA gasbrasil148@hotmail.com
+Endereço Município CEP
+RESIDENCIAL TORQUATO NETO 40 QUADRA 018 CASA 04 ESPLANADA TERESINA PI BRASIL 64039-555
+
+TOMADOR DO SERVIÇO
+CPF/CNPJ /NIF Inscrição Municipal Telefone
+28.390.966/0006-06 713531-9 (00) 0000-0000
+Nome / Nome Empresarial E-mail
+LAND SOLUCOES LTDA email@naoinformado.com
+Endereço Município CEP
+AVENIDA PREFEITO WALL FERRAZ 13651 LETRA A GALPAO G6 PARQUE JACINTA TERESINA PI BRASIL 64035-180
+
+SERVIÇO PRESTADO
+CNAE / CBO
+4520-0/01-00 - SERVICOS DE MANUTENCAO E REPARACAO MECANICA DE VEICULOS AUTOMOTORES
+Serviço
+14.01 - LUBRIFICACAO, LIMPEZA, LUSTRACAO, REVISAO, CARGA E RECARGA, CONSERTO, RESTAURACAO, BLINDAGEM, MANUTENCAO E CONSERVACAO DE
+Local da prestação do serviço País da prestação do serviço
+TERESINA PI BRASIL
+
+DESCRIÇÃO DO SERVIÇO PRESTADO
+RECONDICIONAMENTO 01 VALVULA CONTRA BALANCO - R$: 750,00
+MAO DE OBRA - R$: 200,00
+PEDIDO Nº 6247
+
+DOCUMENTO EMITIDO POR ME OU EPP OPTANTE PELO SIMPLES NACIONAL
+
+TRIBUTAÇÃO MUNICIPAL
+Exigibilidade do ISSQN Município da Incidência do ISSQN Responsável pelo recolhimento do ISSQN
+Exigível TERESINA - PI PRESTADOR DO SERVIÇO
+Retenção do ISSQN Situação do prestador do serviço perante o Simples Nacional Regime especial de tributação do ISSQN
+NÃO RETIDO OPTANTE Simples Nacional
+
+CÁLCULO DO ISSQN
+Valor total da NFSe (R$) Total das deduções (R$) Desc. incondicionado (R$) Base de cálculo do ISSQN (R$) Aliq(%) Valor do ISSQN (R$)
+950,00 0,00 0,00 950,00 2,00 19,00
+
+RETENÇÕES
+ISSQN (R$) IRRF (R$) PIS (R$) COFINS (R$) INSS (R$) CSLL (R$) Outras retenções (R$)
+0,00 0,00 0,00 0,00 0,00 0,00 0,00
+
+VALOR TOTAL
+Base de cálculo do ISSQN (R$) Retenções (R$) Desc. incondicionado (R$) Desc. condicionado (R$) Valor Líquido da NFSe (R$)
+950,00 0,00 0,00 0,00 950,00
+
+INFORMAÇÕES COMPLEMENTARES

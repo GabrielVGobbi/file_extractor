@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nfeProc xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+  <NFe>
+    <infNFe Id="NFe35200114200166000187550010000000015123456789" versao="4.00">
+      <ide>
+        <cUF>35</cUF>
+        <natOp>VENDA DE MERCADORIA</natOp>
+        <mod>55</mod>
+        <serie>1</serie>
+        <nNF>123</nNF>
+        <dhEmi>2026-04-10T10:00:00-03:00</dhEmi>
+        <tpNF>1</tpNF>
+      </ide>
+      <emit>
+        <CNPJ>14200166000187</CNPJ>
+        <xNome>ACME INDUSTRIA LTDA</xNome>
+        <xFant>ACME</xFant>
+        <enderEmit>
+          <xLgr>AV PAULISTA</xLgr>
+          <nro>1000</nro>
+          <xBairro>BELA VISTA</xBairro>
+          <cMun>3550308</cMun>
+          <xMun>SAO PAULO</xMun>
+          <UF>SP</UF>
+          <CEP>01310100</CEP>
+          <xPais>BRASIL</xPais>
+        </enderEmit>
+        <IE>123456789</IE>
+        <CRT>3</CRT>
+      </emit>
+      <dest>
+        <CNPJ>28390966000606</CNPJ>
+        <xNome>LAND SOLUCOES LTDA</xNome>
+        <enderDest>
+          <xLgr>AV PREF WALL FERRAZ</xLgr>
+          <nro>13651</nro>
+          <xBairro>PARQUE JACINTA</xBairro>
+          <cMun>2211001</cMun>
+          <xMun>TERESINA</xMun>
+          <UF>PI</UF>
+          <CEP>64035180</CEP>
+          <xPais>BRASIL</xPais>
+        </enderDest>
+        <IE>7135319</IE>
+      </dest>
+      <total>
+        <ICMSTot>
+          <vBC>1000.00</vBC>
+          <vICMS>180.00</vICMS>
+          <vProd>1000.00</vProd>
+          <vFrete>0.00</vFrete>
+          <vDesc>0.00</vDesc>
+          <vPIS>16.50</vPIS>
+          <vCOFINS>76.00</vCOFINS>
+          <vNF>1000.00</vNF>
+        </ICMSTot>
+      </total>
+    </infNFe>
+  </NFe>
+</nfeProc>
