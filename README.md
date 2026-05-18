@@ -49,11 +49,31 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 Docs interativas em `http://localhost:8000/docs`.
 
-### 5. Smoke test
+### 5. Gerar um token JWT de teste
+
+python -m venv
+
+Com o `venv` ativo e `.env` configurado, execute:
 
 ```powershell
-# Gere um token JWT de teste (exemplo em docs/DEPLOY_DIGITAL_OCEAN.md)
-$TOKEN = "<seu-jwt>"
+.\.venv\Scripts\python.exe .\scripts\issue_token.py --header
+```
+
+Isso imprime um header no formato:
+
+```powershell
+Authorization: Bearer <seu-jwt>
+```
+
+Se preferir apenas o valor do token:
+
+```powershell
+$TOKEN = python .\scripts\issue_token.py
+```
+
+### 6. Smoke test
+
+```powershell
 curl.exe -X POST http://localhost:8000/api/v1/extract `
   -H "Authorization: Bearer $TOKEN" `
   -F "file=@tests/fixtures/nfse_sample.pdf" `

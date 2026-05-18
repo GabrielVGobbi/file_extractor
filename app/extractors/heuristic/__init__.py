@@ -12,7 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from app.extractors.heuristic import nfse_abrasf
+from app.extractors.heuristic import nfse_abrasf, nfse_saopaulo
 from app.validators.confidence import score
 
 
@@ -24,6 +24,8 @@ class HeuristicResult:
 
 
 PARSERS = [
+    # More specific layout first — SP NFS-e has a distinct column structure
+    ("nfse_saopaulo", nfse_saopaulo.parse),
     ("nfse_abrasf", nfse_abrasf.parse),
 ]
 
