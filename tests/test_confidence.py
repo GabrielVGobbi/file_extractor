@@ -55,6 +55,20 @@ def test_missing_required_fields():
     assert "fiscal_document_number" in missing
 
 
+def test_missing_required_nfse_requires_recipient_document_for_erp_insert():
+    missing = missing_required_fields(
+        {
+            "document_category": "nfse",
+            "issuer_cnpj": "31.070.254/0001-00",
+            "fiscal_document_number": "253",
+            "total_fiscal_document": 350000,
+            "issued_at": "2026-06-26T11:12:13",
+        }
+    )
+
+    assert "recipient_document" in missing
+
+
 def test_missing_required_utility_accepts_issuer_name():
     missing = missing_required_fields(
         {

@@ -39,6 +39,7 @@ REQUIRED_BY_CATEGORY: dict[str, tuple[str, ...]] = {
     ),
     "nfse": (
         "issuer_cnpj",
+        "recipient_document",
         "fiscal_document_number",
         "total_fiscal_document",
         "issued_at",

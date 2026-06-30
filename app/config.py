@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
 
     anthropic_api_key: str = ""
-    llm_model: str = "claude-sonnet-4-20250514"
+    llm_model: str = "claude-sonnet-4-6"
     llm_max_tokens: int = 2048
     llm_temperature: float = 0.0
     llm_timeout_seconds: float = 90.0
