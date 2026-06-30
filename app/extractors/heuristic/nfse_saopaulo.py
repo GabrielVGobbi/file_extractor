@@ -105,6 +105,8 @@ def parse(text: str, *, hint_type: str | None = None) -> dict[str, Any] | None:
     upper = common.normalize_for_match(text)
 
     data: dict[str, Any] = {
+        "document_category": "nfse",
+        "document_subtype": "saopaulo",
         "model": "99",
         "type": "saida",
         "direction": "outbound",

@@ -19,6 +19,7 @@ def nfe_bytes() -> bytes:
 
 def test_nfse_parse_core_fields(nfse_bytes):
     data = parse_xml(nfse_bytes)
+    assert data["document_category"] == "nfse"
     assert data["fiscal_document_number"] == "183"
     assert data["model"] == "99"
     assert data["series"] == "U"
@@ -42,6 +43,7 @@ def test_nfse_origin_and_direction(nfse_bytes):
 
 def test_nfe_parse_core_fields(nfe_bytes):
     data = parse_xml(nfe_bytes)
+    assert data["document_category"] == "nfe"
     assert data["fiscal_document_number"] == "123"
     assert data["model"] == "55"
     assert data["series"] == "1"

@@ -97,6 +97,8 @@ def parse(text: str, *, hint_type: str | None = None) -> dict[str, Any] | None:
     upper = common.normalize_for_match(text)
 
     data: dict[str, Any] = {
+        "document_category": "nfse",
+        "document_subtype": "abrasf",
         "model": "99",
         "type": "saida",
         "direction": "outbound",
@@ -109,6 +111,11 @@ def parse(text: str, *, hint_type: str | None = None) -> dict[str, Any] | None:
         data["fiscal_document_number"] = number
     if series:
         data["series"] = series
+
+    access_key = _extract_access_key(text, upper)
+    if access_key:
+        data["access_key"] = access_key
+        data["fiscal_info"]["national_identifier"] = access_key
 
     issued_at = common.parse_datetime(text)
     if issued_at:
@@ -179,6 +186,14 @@ def _extract_number_series(text: str, upper: str) -> tuple[str | None, str | Non
         idx = upper.find("NUMERO/SERIE")
     window = text[idx : idx + 200] if idx != -1 else text[:600]
 
+    for label in ("NUMERO DA NFS-E", "NUMERO DA NFSE"):
+        idx = upper.find(label)
+        if idx != -1:
+            window_after_label = text[idx + len(label) : idx + len(label) + 120]
+            m = re.search(r"\b(\d{1,15})\b", window_after_label)
+            if m:
+                return m.group(1), None
+
     # Pass 1: strict (letter-series). This matches ``183/U`` and ignores
     # ``14/04`` because ``04`` is digits-only.
     strict = re.search(r"\b(\d{1,9})\s*/\s*([A-Z])\b", window)
@@ -196,6 +211,21 @@ def _extract_number_series(text: str, upper: str) -> tuple[str | None, str | Non
     if m2:
         return m2.group(1), None
     return None, None
+
+
+def _extract_access_key(text: str, upper: str) -> str | None:
+    for label in ("CHAVE DE ACESSO DA NFS-E", "CHAVE DE ACESSO DA NFSE"):
+        idx = upper.find(label)
+        if idx == -1:
+            continue
+        window_after_label = text[idx + len(label) : idx + len(label) + 200]
+        m = re.search(r"\b(\d[\d\s.]{42,90}\d)\b", window_after_label)
+        if not m:
+            continue
+        digits = common.digits_only(m.group(1))
+        if 44 <= len(digits) <= 60:
+            return digits
+    return None
 
 
 def _extract_verification_code(text: str, upper: str) -> str | None:

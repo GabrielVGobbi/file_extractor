@@ -1,8 +1,38 @@
 # Fiscal Document Extractor API
 
-Serviço HTTP standalone em FastAPI que recebe documentos fiscais brasileiros (PDF, imagem, XML, DOCX) e devolve um JSON estruturado pronto para inserção na tabela `fiscal_documents` do ERP Laravel.
+Serviço HTTP standalone em FastAPI que recebe **qualquer documento brasileiro** relevante para controladoria fiscal (PDF, imagem, XML, DOCX) e devolve um JSON estruturado pronto para inserção no ERP.
 
-Pipeline: detecção de tipo → extração (pymupdf / OCR / lxml / python-docx) → LLM (Claude) para normalização semântica → validação Pydantic + confidence scoring → JSON.
+## Tipos suportados
+
+| Categoria | Exemplos |
+|---|---|
+| `nfe`, `nfce`, `cte` | DANFE, XML NF-e |
+| `nfse` | NFS-e (SP, ABRASF, etc.) |
+| `nf3e` | Conta de energia (Enel/Eletropaulo) |
+| `utility_water` | Sabesp, saneamento |
+| `utility_electricity` | CEMIG, CPFL, Light |
+| `utility_telecom` | Vivo, Claro, TIM, Oi |
+| `utility_gas` | Comgás |
+| `rental_invoice` | Fatura de locação de equipamentos |
+| `boleto`, `invoice`, `receipt` | Cobranças e faturas genéricas |
+
+## Estrutura do JSON
+
+Além dos campos planos da tabela `fiscal_documents`, a resposta inclui:
+
+- **`parties`** — emitente, destinatário, pagador, beneficiário
+- **`line_items`** — produtos, serviços, rubricas de faturamento
+- **`withholdings`** — retenções (ISS, IRRF, INSS, PIS, COFINS, CSLL)
+- **`taxes`** — detalhamento de impostos (base, alíquota, valor)
+- **`payment`** — boleto, PIX, linha digitável, vencimento, banco
+- **`consumption`** — consumo (kWh, m³, GB), medidor, leituras
+- **`billing`** — período de referência, emissão, apresentação
+
+Pipeline: extração de texto → **markdown** → LLM classifica e estrutura → validação Pydantic → JSON.
+
+Camadas sem LLM (custo zero): cache, XML NF-e/NFS-e, heurística NFS-e SP/ABRASF.
+
+O classificador regex (`suggest_category`) é **apenas advisory** — log/debug, não influencia a IA.
 
 > **XML NF-e / NFS-e ABRASF** NÃO passa pelo LLM — parser lxml determinístico com `confidence = 1.0` e custo zero.
 
@@ -44,7 +74,7 @@ copy .env.example .env
 ### 4. Rodar a API
 
 ```powershell
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 1000
 ```
 
 Docs interativas em `http://localhost:8000/docs`.
@@ -112,8 +142,33 @@ docker compose up -d --build
 pytest
 ```
 
+Analisar os PDFs de exemplo (classificação + preview):
+
+```powershell
+python scripts/analyze_examples.py
+```
+
 ---
 
 ## Licença
 
 Uso interno ORC-Tesseract.
+
+
+
+cd /var/www/html/fiscal-extractor
+
+git pull
+source .venv/bin/activate
+pip install -r requirements.txt
+
+rm -rf .cache/extractions
+
+sudo systemctl restart fiscal-api
+sudo systemctl restart fiscal-worker
+
+sudo systemctl status fiscal-api --no-pager
+sudo systemctl status fiscal-worker --no-pager
+
+curl -fsS http://localhost:8000/health
+curl -fsS http://localhost:8000/health/ready

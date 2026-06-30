@@ -37,6 +37,39 @@ def test_parse_extracts_core_fields():
     assert payload["competence_at"] == "2026-04-01"
 
 
+def test_parse_extracts_number_from_danfse_label():
+    text = """
+    DANFSe v1.0
+    Documento Auxiliar da NFS-e
+    Chave de Acesso da NFS-e
+    31186011247808930000130000000000015526067021669695
+    Número da NFS-e
+    155
+    Data e Hora da emissão da NFS-e
+    15/06/2026 15:00:44
+    EMITENTE DA NFS-e
+    Prestador do Serviço
+    CNPJ / CPF / NIF
+    47.808.930/0001-30
+    TOMADOR DO SERVIÇO
+    CNPJ / CPF / NIF
+    28.390.966/0001-00
+    SERVIÇO PRESTADO
+    Código de Tributação Nacional
+    14.01.01 - Lubrificação, limpeza
+    Valor do Serviço
+    R$ 2.137,00
+    ISSQN
+    """
+
+    payload = parse(text)
+
+    assert payload is not None
+    assert payload["fiscal_document_number"] == "155"
+    assert payload["access_key"] == "31186011247808930000130000000000015526067021669695"
+    assert payload["fiscal_info"]["national_identifier"] == "31186011247808930000130000000000015526067021669695"
+
+
 def test_parse_extracts_fiscal_info():
     payload = parse(NFSE_TEXT)
     assert payload is not None

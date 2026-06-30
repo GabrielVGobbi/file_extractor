@@ -19,13 +19,15 @@ from typing import Any, Literal
 
 from pydantic import ValidationError
 
+from app.classifiers.document import suggest_category
 from app.config import Settings
 from app.extractors import router as extractor_router
 from app.extractors.heuristic import try_heuristic_extract
 from app.llm.client import AnthropicExtractor, LLMExtractionError
-from app.schemas.fiscal import ExtractionMetadata, FiscalDocumentData
+from app.schemas.document import DocumentExtractionData, ExtractionMetadata
 from app.schemas.response import ErrorResponse, ExtractionResponse
 from app.services.cache import ExtractionCache
+from app.services.markdown_formatter import to_markdown
 from app.utils.file_type import detect_file
 from app.utils.logging import get_logger
 from app.validators.confidence import (
@@ -147,6 +149,8 @@ class ExtractorService:
         extraction_method: str
         text_for_llm: str | None = None
         ocr_warnings: list[str] = []
+        detected_category: str | None = None
+        detected_subtype: str | None = None
 
         # ------------------------------------------------------------------
         # Layer 1b — XML (structured, zero-cost)
@@ -154,6 +158,8 @@ class ExtractorService:
         if routed.stage == "structured" and routed.structured_data is not None:
             raw_data = routed.structured_data
             extraction_method = "xml_parser"
+            detected_category = raw_data.get("document_category")
+            detected_subtype = raw_data.get("document_subtype")
         else:
             assert routed.extracted is not None
             if routed.extracted.is_empty:
@@ -167,8 +173,19 @@ class ExtractorService:
             text_for_llm = routed.extracted.text
             is_ocr = routed.extracted.source == "ocr"
 
+            # Advisory only — logged for debug, never sent to or overrides the LLM.
+            suggestion = suggest_category(text_for_llm, hint_type=document_type)
+            detected_category = suggestion.category
+            detected_subtype = suggestion.subtype
+            logger.info(
+                "category_suggestion",
+                category=detected_category,
+                subtype=detected_subtype,
+                confidence=suggestion.confidence,
+            )
+
             # ------------------------------------------------------------------
-            # Layer 2 — Deterministic regex heuristics
+            # Layer 2 — Deterministic regex heuristics (NFS-e layouts, zero LLM cost)
             # ------------------------------------------------------------------
             heuristic_payload: dict[str, Any] | None = None
             if self._settings.enable_heuristic and strategy != "force_llm":
@@ -203,8 +220,10 @@ class ExtractorService:
                         )
                     )
                 try:
+                    markdown_input = to_markdown(text_for_llm, title=filename)
                     llm_result = self._get_llm().extract(
-                        text_for_llm, hint_type=document_type
+                        markdown_input,
+                        hint_type=document_type if document_type != "auto" else None,
                     )
                 except LLMExtractionError as exc:
                     raise ExtractionServiceError(
@@ -215,6 +234,7 @@ class ExtractorService:
 
         raw_data = normalize_money_fields(dict(raw_data), MONEY_FIELDS)
 
+        # Category comes from LLM / XML / heuristic — never from regex suggestion.
         if direction != "auto" and not raw_data.get("direction"):
             raw_data["direction"] = direction
 
@@ -224,14 +244,29 @@ class ExtractorService:
         missing = missing_required_fields(raw_data)
         warnings = build_warnings(raw_data) + ocr_warnings
 
+        llm_category = raw_data.get("document_category")
+        if (
+            extraction_method in ("llm", "ocr+llm")
+            and detected_category
+            and detected_category != "other"
+            and llm_category
+            and llm_category != detected_category
+        ):
+            warnings.append(
+                f"category_suggestion_mismatch:suggested={detected_category},"
+                f"llm={llm_category}"
+            )
+
         raw_data["metadata"] = {
             "extraction_method": extraction_method,
             "confidence": confidence,
             "extracted_at": datetime.now(UTC).isoformat(),
+            "detected_category": detected_category,
+            "detected_subtype": detected_subtype,
         }
 
         try:
-            model = FiscalDocumentData.model_validate(raw_data)
+            model = DocumentExtractionData.model_validate(raw_data)
         except ValidationError as exc:
             raise ExtractionServiceError(
                 ErrorResponse(
@@ -245,6 +280,8 @@ class ExtractorService:
             extraction_method=extraction_method,  # type: ignore[arg-type]
             confidence=confidence,
             extracted_at=datetime.now(UTC),
+            detected_category=detected_category,
+            detected_subtype=detected_subtype,
         )
 
         if missing:

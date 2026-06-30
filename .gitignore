@@ -43,3 +43,5 @@ temp/
 uploads/
 .cache/
 tessdata/
+
+/docs

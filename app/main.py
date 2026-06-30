@@ -60,9 +60,9 @@ def create_app() -> FastAPI:
         title="Fiscal Document Extractor API",
         version=__version__,
         description=(
-            "Serviço standalone que extrai dados de documentos fiscais "
-            "brasileiros (NF-e, NFS-e, NFC-e, CT-e) e devolve um JSON pronto "
-            "para persistir na tabela fiscal_documents do ERP."
+            "Serviço standalone que extrai dados de documentos brasileiros "
+            "(NF-e, NFS-e, contas de consumo, locação, boletos e faturas) "
+            "e devolve JSON estruturado para controladoria fiscal e ERP."
         ),
         lifespan=lifespan,
         debug=settings.app_debug,

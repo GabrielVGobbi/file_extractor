@@ -37,8 +37,8 @@ def mock_llm(monkeypatch) -> Iterator[MagicMock]:
     """Patch :class:`AnthropicExtractor.extract` so no network call happens."""
     mock = MagicMock()
 
-    def _extract(self, document_text: str, *, hint_type: str | None = None):  # noqa: ARG001
-        return mock(document_text, hint_type=hint_type)
+    def _extract(self, document_text: str, *, hint_type: str | None = None, **kwargs):  # noqa: ARG001
+        return mock(document_text, hint_type=hint_type, **kwargs)
 
     monkeypatch.setattr(AnthropicExtractor, "extract", _extract)
     yield mock

@@ -120,6 +120,73 @@ def _address_from_end(node: etree._Element | None) -> dict[str, Any] | None:
     }
 
 
+def _parse_nfe_items(inf: etree._Element) -> list[dict[str, Any]]:
+    items: list[dict[str, Any]] = []
+    for det in inf.iter():
+        if _localname(det) != "det":
+            continue
+        prod = _find(det, "prod")
+        imposto = _find(det, "imposto")
+        icms = None
+        if imposto is not None:
+            for child in imposto:
+                for icms_tag in ("ICMS00", "ICMS10", "ICMS20", "ICMS40", "ICMS51", "ICMS90"):
+                    icms_node = _find(child, icms_tag)
+                    if icms_node is not None:
+                        icms = icms_node
+                        break
+                if icms is not None:
+                    break
+        try:
+            line_number = int(det.attrib.get("nItem", len(items) + 1))
+        except (TypeError, ValueError):
+            line_number = len(items) + 1
+        qty_raw = _text(prod, "qCom") if prod is not None else None
+        items.append(
+            {
+                "line_number": line_number,
+                "code": _text(prod, "cProd") if prod is not None else None,
+                "description": _text(prod, "xProd") if prod is not None else None,
+                "quantity": float(qty_raw) if qty_raw else None,
+                "unit": _text(prod, "uCom") if prod is not None else None,
+                "unit_price": _money_to_cents(_text(prod, "vUnCom") if prod is not None else None),
+                "total_price": _money_to_cents(_text(prod, "vProd") if prod is not None else None),
+                "ncm": _text(prod, "NCM") if prod is not None else None,
+                "cfop": _text(prod, "CFOP") if prod is not None else None,
+                "cst": _text(icms, "CST") if icms is not None else None,
+                "icms_base": _money_to_cents(_text(icms, "vBC") if icms is not None else None),
+                "icms_value": _money_to_cents(_text(icms, "vICMS") if icms is not None else None),
+            }
+        )
+    return items
+
+
+def _parties_nfe(emit: etree._Element | None, dest: etree._Element | None) -> list[dict[str, Any]]:
+    parties: list[dict[str, Any]] = []
+    if emit is not None:
+        parties.append(
+            {
+                "role": "issuer",
+                "document_type": "cnpj" if _text(emit, "CNPJ") else "cpf",
+                "document": _text(emit, "CNPJ") or _text(emit, "CPF"),
+                "name": _text(emit, "xNome"),
+                "fancy_name": _text(emit, "xFant"),
+                "ie": _text(emit, "IE"),
+            }
+        )
+    if dest is not None:
+        parties.append(
+            {
+                "role": "recipient",
+                "document_type": "cnpj" if _text(dest, "CNPJ") else "cpf",
+                "document": _text(dest, "CNPJ") or _text(dest, "CPF"),
+                "name": _text(dest, "xNome"),
+                "ie": _text(dest, "IE"),
+            }
+        )
+    return parties
+
+
 def _parse_nfe(root: etree._Element) -> dict[str, Any]:
     inf = _find(root, "infNFe")
     if inf is None:
@@ -136,8 +203,12 @@ def _parse_nfe(root: etree._Element) -> dict[str, Any]:
 
     issuer_address = _address_from_end(_find(emit, "enderEmit")) if emit is not None else None
     recipient_address = _address_from_end(_find(dest, "enderDest")) if dest is not None else None
+    line_items = _parse_nfe_items(inf)
+    parties = _parties_nfe(emit, dest)
 
     return {
+        "document_category": "nfe",
+        "document_subtype": "xml",
         "access_key": access_key,
         "fiscal_document_number": _text(ide, "nNF") if ide is not None else None,
         "series": _text(ide, "serie") if ide is not None else None,
@@ -175,6 +246,11 @@ def _parse_nfe(root: etree._Element) -> dict[str, Any]:
         "pis_value": _money_to_cents(_text(total, "vPIS") if total is not None else None),
         "cofins_value": _money_to_cents(_text(total, "vCOFINS") if total is not None else None),
         "iss_value": _money_to_cents(_text(total, "vISSQN") if total is not None else None),
+        "icms_value": _money_to_cents(_text(total, "vICMS") if total is not None else None),
+        "icms_st_value": _money_to_cents(_text(total, "vST") if total is not None else None),
+        "ipi_value": _money_to_cents(_text(total, "vIPI") if total is not None else None),
+        "line_items": line_items,
+        "parties": parties,
     }
 
 
@@ -252,6 +328,8 @@ def _parse_nfse(root: etree._Element) -> dict[str, Any]:
     }
 
     return {
+        "document_category": "nfse",
+        "document_subtype": "abrasf",
         "access_key": _text(info, "CodigoVerificacao"),
         "fiscal_document_number": _text(info, "Numero"),
         "series": "U",

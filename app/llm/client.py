@@ -21,20 +21,15 @@ class LLMExtractionError(RuntimeError):
 
 @dataclass
 class LLMExtraction:
-    """Result of an LLM round-trip."""
-
     payload: dict[str, Any]
     stop_reason: str | None
     usage: dict[str, Any] | None
 
 
 class AnthropicExtractor:
-    """Wrapper that sends the raw document text + tool schema to Claude."""
-
     def __init__(self, settings: Settings, client: Anthropic | None = None) -> None:
         self._settings = settings
         if not settings.anthropic_api_key and client is None:
-            # Allow instantiation without a key; ``extract`` will raise at call time.
             self._client = None
         else:
             self._client = client or Anthropic(
@@ -42,13 +37,17 @@ class AnthropicExtractor:
                 timeout=settings.llm_timeout_seconds,
             )
 
-    def extract(self, document_text: str, *, hint_type: str | None = None) -> LLMExtraction:
-        """Send ``document_text`` to the LLM and return the parsed tool input."""
+    def extract(
+        self,
+        document_markdown: str,
+        *,
+        hint_type: str | None = None,
+    ) -> LLMExtraction:
         if self._client is None:
             raise LLMExtractionError(
                 "ANTHROPIC_API_KEY is not configured; cannot run LLM extraction."
             )
-        if not document_text.strip():
+        if not document_markdown.strip():
             raise LLMExtractionError("Cannot extract: document text is empty")
 
         try:
@@ -62,11 +61,14 @@ class AnthropicExtractor:
                 messages=[
                     {
                         "role": "user",
-                        "content": build_user_prompt(document_text, hint_type=hint_type),
+                        "content": build_user_prompt(
+                            document_markdown,
+                            hint_type=hint_type,
+                        ),
                     }
                 ],
             )
-        except APIError as exc:  # pragma: no cover - network path
+        except APIError as exc:  # pragma: no cover
             logger.error("anthropic_api_error", error=str(exc))
             raise LLMExtractionError(f"Anthropic API error: {exc}") from exc
 
@@ -85,7 +87,6 @@ class AnthropicExtractor:
 
 
 def _extract_tool_payload(response: Any) -> dict[str, Any]:
-    """Walk the response content blocks and return the ``tool_use`` input."""
     for block in getattr(response, "content", []) or []:
         if getattr(block, "type", None) == "tool_use" and getattr(block, "name", None) == TOOL_NAME:
             return dict(block.input or {})

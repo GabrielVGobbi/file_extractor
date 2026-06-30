@@ -7,7 +7,10 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.schemas.fiscal import FiscalDocumentData
+from app.schemas.document import DocumentExtractionData
+
+# Backward-compatible alias
+FiscalDocumentData = DocumentExtractionData
 
 ExtractionStatus = Literal["success", "partial", "error"]
 ExtractionMethod = Literal[
@@ -22,8 +25,6 @@ JobStatus = Literal["queued", "processing", "succeeded", "failed"]
 
 
 class ExtractionResponse(BaseModel):
-    """Successful extraction envelope (also used for ``partial`` results)."""
-
     model_config = ConfigDict(extra="ignore")
 
     status: ExtractionStatus = "success"
@@ -31,12 +32,10 @@ class ExtractionResponse(BaseModel):
     extraction_method: ExtractionMethod
     missing_fields: list[str] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
-    data: FiscalDocumentData
+    data: DocumentExtractionData
 
 
 class ErrorResponse(BaseModel):
-    """Shape returned on validation / extraction failures."""
-
     model_config = ConfigDict(extra="ignore")
 
     status: Literal["error"] = "error"
@@ -46,8 +45,6 @@ class ErrorResponse(BaseModel):
 
 
 class JobResponse(BaseModel):
-    """Envelope returned when ``async=true`` is used."""
-
     model_config = ConfigDict(extra="ignore")
 
     status: Literal["accepted"] = "accepted"
@@ -56,8 +53,6 @@ class JobResponse(BaseModel):
 
 
 class JobStatusResponse(BaseModel):
-    """Status + eventual result of an async extraction job."""
-
     model_config = ConfigDict(extra="ignore")
 
     job_id: str
